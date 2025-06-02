@@ -35,4 +35,6 @@
 
     <string name="login_successfully">Login successful</string>
     <string name="login_unsuccessfully">Login unsuccessful</string>
+    <string name="anonymous_login_failed">Unsuccessful anonymous login</string>
+
 </resources>

@@ -32,7 +32,7 @@
     <string name="registered_unsuccessfully">Неуспешна регистрација</string>
     <string name="fill_all_fields">Пополни ги сите полиња</string>
     <string name="enter_email_password">Внесете е-пошта и лозинка</string>
-
+    <string name="anonymous_login_failed">Неуспешна анонимна најава</string>
     <string name="login_successfully">Успешна најава</string>
     <string name="login_unsuccessfully">Неуспешна најава</string>
 </resources>
