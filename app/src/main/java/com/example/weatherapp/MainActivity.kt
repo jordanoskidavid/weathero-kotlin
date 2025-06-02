@@ -53,7 +53,6 @@ class MainActivity : BaseActivity() {
                         onNavigateToLogin = {
                             startActivity(Intent(this, LoginActivity::class.java))
                         },
-                        onLanguageChange = { /* Not used anymore, handled in SettingsActivity */ },
                         onNavigateToSettings = {
                             startActivity(Intent(this, SettingsActivity::class.java))
                         }
@@ -77,7 +76,6 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     onNavigateToRegister: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onLanguageChange: (String) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
@@ -227,7 +225,6 @@ fun MainScreenPreview() {
         MainScreen(
             onNavigateToRegister = {},
             onNavigateToLogin = {},
-            onLanguageChange = {},
             onNavigateToSettings = {}
         )
     }
