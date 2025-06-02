@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Settings
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import java.util.*
 
+
 class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
