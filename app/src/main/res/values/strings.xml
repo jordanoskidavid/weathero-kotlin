@@ -28,4 +28,11 @@
     <string name="loading_weather">Loading Weather</string>
     <string name="weather_error">Weather Error</string>
     <string name="anonymous">Continue as Guest</string>
+    <string name="registered_successfully">Registered successfully</string>
+    <string name="registered_unsuccessfully">Unsuccessful registration</string>
+    <string name="fill_all_fields">Fill all the fields</string>
+    <string name="enter_email_password">Please enter email and password</string>
+
+    <string name="login_successfully">Login successful</string>
+    <string name="login_unsuccessfully">Login unsuccessful</string>
 </resources>

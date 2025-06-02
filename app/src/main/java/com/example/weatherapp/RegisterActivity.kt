@@ -1,5 +1,6 @@
 package com.example.weatherapp
 
+import BaseActivity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 
-class RegisterActivity : ComponentActivity() {
+class RegisterActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
 
@@ -46,13 +47,11 @@ class RegisterActivity : ComponentActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Registration success
-                    Toast.makeText(this, "Registered successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, WeatherActivity::class.java))
                     finish()
                 } else {
-                    // Registration failed - handle error
-                    showToast(task.exception?.message ?: "Registration failed")
+                    showToast(task.exception?.message ?: getString(R.string.registered_unsuccessfully))
                 }
             }
     }
@@ -77,7 +76,7 @@ fun RegisterScreen(
 
     fun register() {
         if (username.isBlank() || email.isBlank() || password.isBlank()) {
-            errorMessage = "Please fill all fields"
+            errorMessage =  context.getString(R.string.fill_all_fields)
         } else {
             errorMessage = null
             // Call the real registration function passed from Activity

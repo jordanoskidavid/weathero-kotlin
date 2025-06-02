@@ -28,4 +28,11 @@
     <string name="loading_weather">Вчитување на времето</string>
     <string name="weather_error">Грешка со Метеото</string>
     <string name="anonymous">Продолжи како гостин</string>
+    <string name="registered_successfully">Успешна регистрација</string>
+    <string name="registered_unsuccessfully">Неуспешна регистрација</string>
+    <string name="fill_all_fields">Пополни ги сите полиња</string>
+    <string name="enter_email_password">Внесете е-пошта и лозинка</string>
+
+    <string name="login_successfully">Успешна најава</string>
+    <string name="login_unsuccessfully">Неуспешна најава</string>
 </resources>
