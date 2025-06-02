@@ -25,6 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import java.util.*
+import android.app.Activity
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+
+
 
 class MainActivity : BaseActivity() {
 
@@ -75,6 +80,7 @@ fun MainScreen(
     onLanguageChange: (String) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
+    val context = LocalContext.current
     val prefs = LocalContext.current.getSharedPreferences("settings", 0)
     val savedLangCode = prefs.getString("lang", "en") ?: "en"
     var currentLanguage by remember {
@@ -89,7 +95,7 @@ fun MainScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF00BFFF)) // Sky blue background
+            .background(Color(0xFF00BFFF))
     )
     {
         Box(
@@ -190,11 +196,25 @@ fun MainScreen(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(
-                    onClick = { /* TODO: Anonymous login */ },
+                    onClick = {
+                        FirebaseAuth.getInstance().signInAnonymously()
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val intent = Intent(context, WeatherActivity::class.java)
+                                    context.startActivity(intent)
+                                    if (context is Activity) {
+                                        context.finish()
+                                    }
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.anonymous_login_failed), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(id = R.string.anonymous), color = Color.Gray, fontSize = 18.sp)
                 }
+
             }
         }
     }

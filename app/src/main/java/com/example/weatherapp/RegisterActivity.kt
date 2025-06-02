@@ -3,6 +3,7 @@ package com.example.weatherapp
 import BaseActivity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -13,26 +14,26 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-
-
-
+import com.google.firebase.auth.FirebaseAuth
 
 class RegisterActivity : BaseActivity() {
 
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
 
         setContent {
             RegisterScreen(
-                onRegisterSuccess = {
-                    startActivity(Intent(this, WeatherActivity::class.java))
-                    finish()
+                onRegister = { email, password ->
+                    registerUser(email, password)
                 },
                 onNavigateToLogin = {
                     startActivity(Intent(this, LoginActivity::class.java))
@@ -41,16 +42,47 @@ class RegisterActivity : BaseActivity() {
             )
         }
     }
+
+    private fun registerUser(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, WeatherActivity::class.java))
+                    finish()
+                } else {
+                    showToast(task.exception?.message ?: getString(R.string.registered_unsuccessfully))
+                }
+            }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
 }
+
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: () -> Unit,
+    onRegister: (email: String, password: String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+
+    fun register() {
+        if (username.isBlank() || email.isBlank() || password.isBlank()) {
+            errorMessage =  context.getString(R.string.fill_all_fields)
+        } else {
+            errorMessage = null
+            // Call the real registration function passed from Activity
+            onRegister(email, password)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -71,15 +103,15 @@ fun RegisterScreen(
                 label = { Text(stringResource(id = R.string.username)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Black, // Focused border color
-                    unfocusedIndicatorColor = Color.Black, // Unfocused border color
-                    focusedTextColor = Color.Black, // Text color when focused
-                    unfocusedTextColor = Color.Black, // Text color when unfocused
-                    focusedLabelColor = Color(0xFF00BFFF), // Label color when focused
-                    unfocusedLabelColor = Color.Black, // Label color when unfocused
-                    cursorColor = Color(0xFF00BFFF), // Cursor color
-                    focusedContainerColor = Color.Transparent, // Container background when focused
-                    unfocusedContainerColor = Color.Transparent, // Container background when unfocused
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color(0xFF00BFFF),
+                    unfocusedLabelColor = Color.Black,
+                    cursorColor = Color(0xFF00BFFF),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                 )
             )
 
@@ -91,15 +123,15 @@ fun RegisterScreen(
                 label = { Text(stringResource(id = R.string.email)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Black, // Focused border color
-                    unfocusedIndicatorColor = Color.Black, // Unfocused border color
-                    focusedTextColor = Color.Black, // Text color when focused
-                    unfocusedTextColor = Color.Black, // Text color when unfocused
-                    focusedLabelColor = Color(0xFF00BFFF), // Label color when focused
-                    unfocusedLabelColor = Color.Black, // Label color when unfocused
-                    cursorColor = Color(0xFF00BFFF), // Cursor color
-                    focusedContainerColor = Color.Transparent, // Container background when focused
-                    unfocusedContainerColor = Color.Transparent, // Container background when unfocused
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color(0xFF00BFFF),
+                    unfocusedLabelColor = Color.Black,
+                    cursorColor = Color(0xFF00BFFF),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                 )
             )
 
@@ -112,22 +144,22 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Black, // Focused border color
-                    unfocusedIndicatorColor = Color.Black, // Unfocused border color
-                    focusedTextColor = Color.Black, // Text color when focused
-                    unfocusedTextColor = Color.Black, // Text color when unfocused
-                    focusedLabelColor = Color(0xFF00BFFF), // Label color when focused
-                    unfocusedLabelColor = Color.Black, // Label color when unfocused
-                    cursorColor = Color(0xFF00BFFF), // Cursor color
-                    focusedContainerColor = Color.Transparent, // Container background when focused
-                    unfocusedContainerColor = Color.Transparent, // Container background when unfocused
+                    focusedIndicatorColor = Color.Black,
+                    unfocusedIndicatorColor = Color.Black,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedLabelColor = Color(0xFF00BFFF),
+                    unfocusedLabelColor = Color.Black,
+                    cursorColor = Color(0xFF00BFFF),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                 )
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Surface(
-                onClick = { onRegisterSuccess() },
+                onClick = { register() },
                 shape = RoundedCornerShape(8.dp),
                 color = Color(0xFF00BFFF),
                 modifier = Modifier
@@ -150,6 +182,14 @@ fun RegisterScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
 
             Text(
                 text = stringResource(id = R.string.already_have_account),
@@ -176,13 +216,12 @@ fun RegisterScreen(
                 )
             }
 
-
             Spacer(modifier = Modifier.height(12.dp))
 
             Surface(
                 onClick = { /* TODO: Google login */ },
                 shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFEA4335), // Google red
+                color = Color(0xFFEA4335),
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
@@ -201,11 +240,10 @@ fun RegisterScreen(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(8.dp))
 
             Surface(
-                onClick = { /* TODO: Google login */ },
+                onClick = { /* TODO: Facebook login */ },
                 shape = RoundedCornerShape(8.dp),
                 color = Color(0xFF1565C0),
                 modifier = Modifier
@@ -227,5 +265,4 @@ fun RegisterScreen(
             }
         }
     }
-
 }
