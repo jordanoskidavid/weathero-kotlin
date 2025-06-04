@@ -42,11 +42,9 @@ class MainActivity : BaseActivity() {
         val savedLang = prefs.getString("lang", "en") ?: "en"
         updateLocale(savedLang)
 
-        // ✅ Initialize Firebase Analytics
         val firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
 
-        // ✅ Get FCM Token
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -55,7 +53,6 @@ class MainActivity : BaseActivity() {
                 }
                 val token = task.result
                 Log.d("FCM", "Device token: $token")
-                Toast.makeText(this, "FCM Token logged", Toast.LENGTH_SHORT).show()
             }
 
         setContent {
