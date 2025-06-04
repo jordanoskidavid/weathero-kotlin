@@ -67,6 +67,9 @@ dependencies {
     implementation ("com.facebook.android:facebook-login:16.3.0")
     implementation ("com.facebook.android:facebook-android-sdk:16.3.0")
 
+    implementation ("com.google.firebase:firebase-firestore-ktx")
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

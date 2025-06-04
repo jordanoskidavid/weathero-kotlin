@@ -21,6 +21,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 class RegisterActivity : BaseActivity() {
 
@@ -32,9 +34,7 @@ class RegisterActivity : BaseActivity() {
 
         setContent {
             RegisterScreen(
-                onRegister = { email, password ->
-                    registerUser(email, password)
-                },
+                onRegister = { email, password,username -> registerUser(email, password, username) },
                 onNavigateToLogin = {
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
@@ -43,13 +43,29 @@ class RegisterActivity : BaseActivity() {
         }
     }
 
-    private fun registerUser(email: String, password: String) {
+    private fun registerUser(email: String, password: String, username: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, WeatherActivity::class.java))
-                    finish()
+                    val userId = auth.currentUser?.uid
+                    val db = FirebaseFirestore.getInstance()
+
+                    val userMap = hashMapOf(
+                        "username" to username
+                    )
+
+                    if (userId != null) {
+                        db.collection("users").document(userId)
+                            .set(userMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this, WeatherActivity::class.java))
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                showToast("Error saving username: ${e.message}")
+                            }
+                    }
                 } else {
                     showToast(task.exception?.message ?: getString(R.string.registered_unsuccessfully))
                 }
@@ -64,7 +80,7 @@ class RegisterActivity : BaseActivity() {
 
 @Composable
 fun RegisterScreen(
-    onRegister: (email: String, password: String) -> Unit,
+    onRegister: (email: String, password: String, username: String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     var username by remember { mutableStateOf("") }
@@ -80,7 +96,7 @@ fun RegisterScreen(
         } else {
             errorMessage = null
 
-            onRegister(email, password)
+            onRegister(email, password,username)
         }
     }
 
