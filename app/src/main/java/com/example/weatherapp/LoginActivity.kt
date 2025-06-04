@@ -5,9 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,10 +20,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.GraphRequest
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -33,6 +39,7 @@ class LoginActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var callbackManager: CallbackManager
 
     companion object {
         private const val TAG = "LoginActivity"
@@ -42,6 +49,9 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
+
+        // Initialize Facebook callback manager
+        callbackManager = CallbackManager.Factory.create()
 
         // Configure Google Sign In with account selection
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -59,6 +69,9 @@ class LoginActivity : BaseActivity() {
                 },
                 onGoogleLogin = {
                     signInWithGoogle()
+                },
+                onFacebookLogin = {
+                    signInWithFacebook()
                 },
                 onNavigateToRegister = {
                     startActivity(Intent(this, RegisterActivity::class.java))
@@ -109,10 +122,77 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    private fun signInWithFacebook() {
+        LoginManager.getInstance().logInWithReadPermissions(
+            this,
+            listOf("email", "public_profile")
+        )
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+                    Log.d(TAG, "facebook:onSuccess:$loginResult")
+                    handleFacebookAccessToken(loginResult.accessToken)
+                }
+
+                override fun onCancel() {
+                    Log.d(TAG, "facebook:onCancel")
+                    Toast.makeText(this@LoginActivity, "Facebook login cancelled", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onError(error: FacebookException) {
+                    Log.d(TAG, "facebook:onError", error)
+                    Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            })
+    }
+
+    private fun handleFacebookAccessToken(token: AccessToken) {
+        Log.d(TAG, "handleFacebookAccessToken:$token")
+
+        val credential = FacebookAuthProvider.getCredential(token.token)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = auth.currentUser
+
+                    // Get additional user info from Facebook Graph API
+                    val request = GraphRequest.newMeRequest(token) { obj, _ ->
+                        try {
+                            val name = obj?.getString("name")
+                            val email = obj?.getString("email")
+                            Log.d(TAG, "Facebook user: $name, $email")
+
+                            Toast.makeText(this, "Welcome ${name ?: user?.displayName}", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, WeatherActivity::class.java))
+                            finish()
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error parsing Facebook user data", e)
+                            Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this, WeatherActivity::class.java))
+                            finish()
+                        }
+                    }
+
+                    val parameters = Bundle()
+                    parameters.putString("fields", "id,name,email")
+                    request.parameters = parameters
+                    request.executeAsync()
+
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Toast.makeText(this, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
     // Optional: Add this method to completely reset Google account selection
     private fun clearGoogleAccountCache() {
         googleSignInClient.revokeAccess().addOnCompleteListener {
-            Toast.makeText(this, "Google account cache cleared", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.google_cache_cleared), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -120,24 +200,24 @@ class LoginActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        // Pass the activity result back to the Facebook SDK
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                Log.d(TAG, "Account email: ${account.email}")
-                Log.d(TAG, "Account idToken: ${account.idToken != null}")
+                Log.d(TAG, getString(R.string.firebase_auth_wgoogle) + account.id)
+                Log.d(TAG, getString(R.string.authentication_email) + account.email)
+                Log.d(TAG, getString(R.string.authentication_idtoken) + (account.idToken != null))
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed with status code: ${e.statusCode}", e)
+                Log.w(TAG, getString(R.string.google_login_failed) + e.statusCode, e)
                 val errorMessage = when (e.statusCode) {
                     10 -> "Developer error. Check SHA-1 fingerprint and google-services.json configuration."
-                    12501 -> "Sign in was cancelled by user."
-                    12502 -> "Sign in currently in progress."
-                    7 -> "Network error. Check your internet connection."
+                    12501 -> getString(R.string.login_canceled)
+                    12502 -> getString(R.string.login_inprogress)
+                    7 -> getString(R.string.check_your_internet)
                     else -> "Google sign in failed: ${e.message} (Code: ${e.statusCode})"
                 }
                 Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
@@ -150,14 +230,12 @@ class LoginActivity : BaseActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, WeatherActivity::class.java))
                     finish()
                 } else {
-                    // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -169,6 +247,7 @@ class LoginActivity : BaseActivity() {
 fun LoginScreen(
     onLogin: (email: String, password: String) -> Unit,
     onGoogleLogin: () -> Unit,
+    onFacebookLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
 ) {
     var email by remember { mutableStateOf("") }
@@ -191,6 +270,12 @@ fun LoginScreen(
     fun doGoogleLogin() {
         isLoading = true
         onGoogleLogin()
+        isLoading = false
+    }
+
+    fun doFacebookLogin() {
+        isLoading = true
+        onFacebookLogin()
         isLoading = false
     }
 
@@ -341,9 +426,9 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Surface(
-            onClick = { /* TODO: Facebook login */ },
+            onClick = { if (!isLoading) doFacebookLogin() },
             shape = RoundedCornerShape(8.dp),
-            color = Color(0xFF1565C0),
+            color = if (isLoading) Color.Gray else Color(0xFF1565C0),
             modifier = Modifier
                 .fillMaxWidth()
                 .border(1.dp, Color.Black, RoundedCornerShape(8.dp))

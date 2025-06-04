@@ -64,6 +64,11 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-analytics-ktx:21.6.1")
     implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
+    implementation ("com.facebook.android:facebook-login:16.3.0")
+    implementation ("com.facebook.android:facebook-android-sdk:16.3.0")
+
+    implementation ("com.google.firebase:firebase-firestore-ktx")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

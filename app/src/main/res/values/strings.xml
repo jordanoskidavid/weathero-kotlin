@@ -1,5 +1,8 @@
 <resources>
     <string name="default_web_client_id">647284211208-nqocfks6lvciat24lbn084khsjprt70j.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">714771391146588</string>
+    <string name="facebook_client_token">a5f11bac9ab367f3a46e99dd634444e0</string>
+
     <string name="app_name">Weathero</string>
     <string name="welcome_to">Welcome to</string>
     <string name="access_your_weather_info">Access your weather info</string>
@@ -37,5 +40,12 @@
     <string name="login_successfully">Login successful</string>
     <string name="login_unsuccessfully">Login unsuccessful</string>
     <string name="anonymous_login_failed">Unsuccessful anonymous login</string>
-
+    <string name="google_cache_cleared">Google cache cleared</string>
+    <string name="firebase_auth_wgoogle">Authentication with Google Firebase</string>
+    <string name="authentication_email">Email authentication:</string>
+    <string name="authentication_idtoken">ID token authentication</string>
+    <string name="google_login_failed">Google login failed with code:</string>
+    <string name="login_canceled">Login was cancelled by user</string>
+    <string name="login_inprogress">Login is in progress</string>
+    <string name="check_your_internet">Check your internet connection</string>
 </resources>
