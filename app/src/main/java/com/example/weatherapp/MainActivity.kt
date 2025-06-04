@@ -1,14 +1,19 @@
 package com.example.weatherapp
 
 import BaseActivity
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,15 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import com.example.weatherapp.ui.theme.WeatherAppTheme
-import java.util.*
-import android.app.Activity
-import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-
-
+import com.google.firebase.messaging.FirebaseMessaging
+import java.util.*
 
 class MainActivity : BaseActivity() {
 
@@ -37,10 +38,25 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Load saved language preference and apply locale
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
         val savedLang = prefs.getString("lang", "en") ?: "en"
         updateLocale(savedLang)
+
+        // ✅ Initialize Firebase Analytics
+        val firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
+
+        // ✅ Get FCM Token
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                Log.d("FCM", "Device token: $token")
+                Toast.makeText(this, "FCM Token logged", Toast.LENGTH_SHORT).show()
+            }
 
         setContent {
             WeatherAppTheme {
@@ -79,7 +95,7 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit
 ) {
     val context = LocalContext.current
-    val prefs = LocalContext.current.getSharedPreferences("settings", 0)
+    val prefs = context.getSharedPreferences("settings", 0)
     val savedLangCode = prefs.getString("lang", "en") ?: "en"
     var currentLanguage by remember {
         mutableStateOf(
@@ -94,11 +110,9 @@ fun MainScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF00BFFF))
-    )
-    {
+    ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
         ) {
             Icon(
@@ -112,6 +126,7 @@ fun MainScreen(
                     .clickable { onNavigateToSettings() }
             )
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,7 +134,6 @@ fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Image(
@@ -192,7 +206,9 @@ fun MainScreen(
                         fontSize = 20.sp
                     )
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
                 TextButton(
                     onClick = {
                         FirebaseAuth.getInstance().signInAnonymously()
@@ -200,19 +216,24 @@ fun MainScreen(
                                 if (task.isSuccessful) {
                                     val intent = Intent(context, WeatherActivity::class.java)
                                     context.startActivity(intent)
-                                    if (context is Activity) {
-                                        context.finish()
-                                    }
+                                    if (context is Activity) context.finish()
                                 } else {
-                                    Toast.makeText(context, context.getString(R.string.anonymous_login_failed), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.anonymous_login_failed),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(id = R.string.anonymous), color = Color.Gray, fontSize = 18.sp)
+                    Text(
+                        stringResource(id = R.string.anonymous),
+                        color = Color.Gray,
+                        fontSize = 18.sp
+                    )
                 }
-
             }
         }
     }
