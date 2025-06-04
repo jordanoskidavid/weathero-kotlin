@@ -1,5 +1,8 @@
 <resources>
     <string name="default_web_client_id">647284211208-nqocfks6lvciat24lbn084khsjprt70j.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">714771391146588</string>
+    <string name="facebook_client_token">a5f11bac9ab367f3a46e99dd634444e0</string>
+
     <string name="app_name">Weathero</string>
     <string name="welcome_to">Добредојде во</string>
     <string name="access_your_weather_info">Добиј метео инфо</string>
