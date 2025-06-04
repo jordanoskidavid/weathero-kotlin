@@ -112,7 +112,7 @@ class LoginActivity : BaseActivity() {
     // Optional: Add this method to completely reset Google account selection
     private fun clearGoogleAccountCache() {
         googleSignInClient.revokeAccess().addOnCompleteListener {
-            Toast.makeText(this, "Google account cache cleared", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,  getString(R.string.google_cache_cleared), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -120,24 +120,23 @@ class LoginActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
-                // Google Sign In was successful, authenticate with Firebase
+
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                Log.d(TAG, "Account email: ${account.email}")
-                Log.d(TAG, "Account idToken: ${account.idToken != null}")
+                Log.d(TAG,  getString(R.string.firebase_auth_wgoogle) + account.id)
+                Log.d(TAG, getString(R.string.authentication_email) + account.email)
+                Log.d(TAG, getString(R.string.authentication_idtoken) + (account.idToken != null))
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed with status code: ${e.statusCode}", e)
+
+                Log.w(TAG, getString(R.string.google_login_failed) + e.statusCode, e)
                 val errorMessage = when (e.statusCode) {
                     10 -> "Developer error. Check SHA-1 fingerprint and google-services.json configuration."
-                    12501 -> "Sign in was cancelled by user."
-                    12502 -> "Sign in currently in progress."
-                    7 -> "Network error. Check your internet connection."
+                    12501 -> getString(R.string.login_canceled)
+                    12502 -> getString(R.string.login_inprogress)
+                    7 -> getString(R.string.check_your_internet)
                     else -> "Google sign in failed: ${e.message} (Code: ${e.statusCode})"
                 }
                 Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
@@ -150,14 +149,12 @@ class LoginActivity : BaseActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
                     Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, WeatherActivity::class.java))
                     finish()
                 } else {
-                    // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }

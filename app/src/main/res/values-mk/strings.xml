@@ -13,8 +13,8 @@
     <string name="create_account">Направи профил</string>
     <string name="login_to_account">Најавa</string>
     <string name="or_continue_with">или продолжи со</string>
-    <string name="google">Продолжи со Гугл</string>
-    <string name="facebook">Продолжи со Фејсбук</string>
+    <string name="google">Продолжи со Google</string>
+    <string name="facebook">Продолжи со Facebook</string>
     <string name="settings">Подесувања</string>
     <string name="choose_language">Избери јазик</string>
     <string name="getting_your_location">Вчитување на вашата локација</string>
@@ -36,4 +36,14 @@
     <string name="anonymous_login_failed">Неуспешна анонимна најава</string>
     <string name="login_successfully">Успешна најава</string>
     <string name="login_unsuccessfully">Неуспешна најава</string>
+    <string name="google_cache_cleared">Исчистен е кешот од Google</string>
+    <string name="firebase_auth_wgoogle">Автентикација со Google Firebase</string>
+    <string name="authentication_email">Автентикација со е-пошта</string>
+    <string name="authentication_idtoken">Автентикација со ID токен</string>
+    <string name="google_login_failed">Пропадна најавата со Google со код:</string>
+    <string name="login_canceled">Најавата беше откажана од корисникот</string>
+    <string name="login_inprogress">Најавата е во прогрес</string>
+    <string name="check_your_internet">Проверете ја вашата интернет конекција</string>
+
+
 </resources>

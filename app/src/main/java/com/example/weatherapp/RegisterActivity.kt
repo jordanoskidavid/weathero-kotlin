@@ -79,7 +79,7 @@ fun RegisterScreen(
             errorMessage =  context.getString(R.string.fill_all_fields)
         } else {
             errorMessage = null
-            // Call the real registration function passed from Activity
+
             onRegister(email, password)
         }
     }
@@ -199,70 +199,6 @@ fun RegisterScreen(
                 color = Color(0xFF00BFFF),
                 fontSize = 18.sp
             )
-        }
-
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.or_continue_with),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Surface(
-                onClick = { /* TODO: Google login */ },
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFEA4335),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 13.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.google),
-                        color = Color.White,
-                        fontSize = 18.sp
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Surface(
-                onClick = { /* TODO: Facebook login */ },
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFF1565C0),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 13.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.facebook),
-                        color = Color.White,
-                        fontSize = 18.sp
-                    )
-                }
-            }
         }
     }
 }
