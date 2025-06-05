@@ -29,4 +29,3 @@ WeatherApp is a modern Android app built using **Jetpack Compose**, **Room Datab
 
 ```bash
 git clone https://github.com/jordanoskidavid/weathero-kotlin.git
-cd WeatherApp
