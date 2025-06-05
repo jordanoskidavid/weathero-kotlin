@@ -28,5 +28,5 @@ WeatherApp is a modern Android app built using **Jetpack Compose**, **Room Datab
 ### Clone the Repo
 
 ```bash
-git clone https://github.com/jordanoskidavid/weatherapp.git
-cd weatherapp
+git clone https://github.com/jordanoskidavid/weathero-kotlin.git
+cd WeatherApp
