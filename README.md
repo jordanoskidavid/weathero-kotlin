@@ -1,4 +1,31 @@
-An android app for weather forecast made with Kotlin in Andorid studio with some aditional functionalities for faculty project using Firebase. This will be my first full project in the mobile development.
+# 🌦️ WeatherApp
 
+WeatherApp is a modern Android app built using **Jetpack Compose**, **Room Database**, **Firebase**, and **Open Weather**. It provides real-time weather updates, user authentication (Email, Google, Facebook), and location services in a responsive UI that supports both portrait and landscape modes.
 
-main branch is the production branch and I will be working in the development branch for now.
+---
+
+##  Features
+
+-  Current location weather updates
+-  Firebase Authentication (Email, Google, Facebook)
+-  Local data persistence using Room
+-  Push Notifications (Firebase Cloud Messaging)
+-  Modern UI with Jetpack Compose
+-  Fully supports screen rotation (landscape/portrait)
+
+---
+
+## Tech Stack
+
+- Kotlin
+- Jetpack Compose
+- Room Database
+- Firebase (Auth, Firestore, Messaging, Analytics)
+- Open Weather API
+- GPS
+---
+
+### Clone the Repo
+
+```bash
+git clone https://github.com/jordanoskidavid/weathero-kotlin.git
