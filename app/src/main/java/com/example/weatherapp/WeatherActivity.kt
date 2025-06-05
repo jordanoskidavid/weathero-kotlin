@@ -5,6 +5,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.CalendarContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,7 +85,7 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
     ) {
         when {
             viewModel.isLoading -> {
-                CircularProgressIndicator()
+                CircularProgressIndicator(  color = Color(0xFF00BFFF))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(stringResource(id = R.string.getting_your_location))
             }
@@ -112,7 +114,8 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
                 Text(
                     text = viewModel.currentCity,
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 40.sp
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -159,7 +162,9 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)
+                            )
                         ) {
                             Column(
                                 modifier = Modifier.padding(20.dp),
@@ -169,7 +174,7 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
                                     text = "${weather.main.temp.roundToInt()}°C",
                                     fontSize = 48.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = Color(0xFF00BFFF)
                                 )
 
                                 Text(
@@ -238,9 +243,14 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
                             scope.launch {
                                 viewModel.getCurrentLocation(context)
                             }
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00BFFF),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text(stringResource(id = R.string.refresh_location))
+
                     }
 
                     if (viewModel.weatherData != null || viewModel.weatherError.isNotEmpty()) {
@@ -249,7 +259,11 @@ fun WeatherScreen(viewModel: LocationViewModel = viewModel()) {
                                 scope.launch {
                                     viewModel.refreshWeather(context)
                                 }
-                            }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF00BFFF),
+                                contentColor = Color.White
+                            )
                         ) {
                             Text(stringResource(id = R.string.refresh_weather))
                         }
