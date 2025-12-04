@@ -38,7 +38,7 @@ class LocationViewModel : ViewModel() {
     var weatherError by mutableStateOf("")
         private set
 
-    private val API_KEY = "52249397692f256d0b20c50d0905415f"
+    private val API_KEY = ""
     private val weatherApi = WeatherApiService.create()
 
     suspend fun getCurrentLocation(context: Context) {
